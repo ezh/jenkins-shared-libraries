@@ -5,14 +5,13 @@
 */
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import hudson.tasks.test.AbstractTestResultAction;
 import hudson.model.Actionable;
 
 def call(String buildStatus = 'STARTED', String channel = '@nobayashi') {
 
   // buildStatus of null means successfull
   buildStatus = buildStatus ?: 'SUCCESSFUL'
-  channel = channel ?: '#jenkins'
+  channel = channel ?: '@nobayashi'
 
 
   // Default values
@@ -43,31 +42,6 @@ def call(String buildStatus = 'STARTED', String channel = '@nobayashi') {
     colorCode = 'danger'
   }
 
-  // get test results for slack message
-  @NonCPS
-  def getTestSummary = { ->
-    def testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
-    def summary = ""
-
-    if (testResultAction != null) {
-        def total = testResultAction.getTotalCount()
-        def failed = testResultAction.getFailCount()
-        def skipped = testResultAction.getSkipCount()
-
-        summary = "Test results:\n\t"
-        summary = summary + ("Passed: " + (total - failed - skipped))
-        summary = summary + (", Failed: " + failed + " ${testResultAction.failureDiffString}")
-        summary = summary + (", Skipped: " + skipped)
-    } else {
-        summary = "No tests found"
-    }
-    return summary
-  }
-  def testSummaryRaw = getTestSummary()
-  // format test summary as a code block
-  def testSummary = "```${testSummaryRaw}```"
-  println testSummary.toString()
-
   JSONObject attachment = new JSONObject();
   attachment.put('author',"jenkins");
   attachment.put('title', title.toString());
@@ -91,12 +65,7 @@ def call(String buildStatus = 'STARTED', String channel = '@nobayashi') {
   commitMessage.put('title', 'Commit Message');
   commitMessage.put('value', message.toString());
   commitMessage.put('short', false);
-  // JSONObject for test results
-  JSONObject testResults = new JSONObject();
-  testResults.put('title', 'Test Summary')
-  testResults.put('value', testSummary.toString())
-  testResults.put('short', false)
-  attachment.put('fields', [branch, commitAuthor, commitMessage, testResults]);
+  attachment.put('fields', [branch, commitAuthor, commitMessage]);
   JSONArray attachments = new JSONArray();
   attachments.add(attachment);
   println attachments.toString()
