@@ -7,11 +7,11 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import hudson.model.Actionable;
 
-def call(String buildStatus = 'STARTED', String channel = '@nobayashi') {
+def call(String buildStatus = 'STARTED', String channel = '#alerts') {
 
   // buildStatus of null means successfull
   buildStatus = buildStatus ?: 'SUCCESSFUL'
-  channel = channel ?: '@nobayashi'
+  channel = channel ?: '#alerts'
 
 
   // Default values
