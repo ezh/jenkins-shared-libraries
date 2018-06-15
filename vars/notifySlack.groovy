@@ -47,7 +47,7 @@ def call(String buildStatus = 'STARTED', String channel = '#ci') {
   attachment.put('title', title.toString());
   attachment.put('title_link',title_link.toString());
   attachment.put('text', subject.toString());
-  attachment.put('fallback', "fallback message");
+  attachment.put('fallback', "${buildStatus}: Job '${env.JOB_NAME}");
   attachment.put('color',colorCode);
   attachment.put('mrkdwn_in', ["fields"])
   // JSONObject for branch
